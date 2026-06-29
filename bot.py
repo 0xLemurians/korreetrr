@@ -246,7 +246,7 @@ Son bölümde yalnızca kısa bir yorum/not yazabilirsin.
 - Crypto jargonunu koru: DeFi, DEX, ETF, staking, airdrop, mainnet, testnet, validator, OTC, liquidity, Series B, FDV vb.
 - Bilmediğin şeyi uydurma.
 - Kaynak metinde olmayan bilgiyi çeviri bölümüne ekleme.
-- Kısa Not bölümünde resmi açıklama mı, kanal yorumu mu, beklenti mi olduğunu 1-2 cümleyle belirt.
+- Kısa Not bölümünde resmi açıklama mı, kanal yorumu mu, beklenti mi olduğunu 2-3 cümleyle belirt.
 - Yatırım tavsiyesi verme.
 
 {image_instruction}
@@ -259,7 +259,7 @@ Son bölümde yalnızca kısa bir yorum/not yazabilirsin.
 [Görsel varsa görseldeki yazıların ve görünen önemli bilgilerin Türkçe çevirisi. Görsel yoksa 'Görsel yok.' yaz.]
 
 📌 Kısa Not:
-[1-2 cümle. Sadece bağlam/yorum: resmi açıklama mı, kanal yorumu mu, beklenti mi? Abartma, yatırım tavsiyesi verme.]
+[2-3 cümle. Sadece bağlam/yorum: resmi açıklama mı, kanal yorumu mu, beklenti mi? Abartma, yatırım tavsiyesi verme.]
 
 🏷️ Etiketler:
 [varsa proje/token/konu isimleri]
