@@ -33,7 +33,7 @@ TARGET_CHANNEL_RAW = os.environ.get("TARGET_CHANNEL", "https://t.me/KnightOnline
 CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
 SEEN_IDS_FILE = os.environ.get("SEEN_IDS_FILE", "seen_ids.json")
 
-LINK_READER_ENABLED = os.environ.get("LINK_READER_ENABLED", "true").lower() == "true"
+LINK_READER_ENABLED = os.environ.get("LINK_READER_ENABLED", "false").lower() == "true"
 VISION_ENABLED = os.environ.get("VISION_ENABLED", "true").lower() == "true"
 MAX_LINKS = int(os.environ.get("MAX_LINKS", "2"))
 MAX_OUTPUT_TOKENS = int(os.environ.get("MAX_OUTPUT_TOKENS", "900"))
@@ -218,32 +218,57 @@ def build_prompt(text: str, link_context: str, has_image: bool) -> str:
     image_instruction = ""
     if has_image:
         image_instruction = """
-- Görsel varsa içindeki Korece/İngilizce/Türkçe yazıları, grafikleri, token isimlerini, fiyatları ve önemli sayıları oku.
+Görsel varsa:
+- Görseldeki Korece/İngilizce/Türkçe yazıları Türkçeye çevir.
+- Tweet, tablo, grafik, dashboard, ranking, fiyat, yüzde, tarih, token/proje isimleri varsa yazıldığı gibi aktar ve Türkçeleştir.
 - Görselde net olmayan yerleri uydurma; 'görselde net değil' de.
-- Görsel bir grafikse yön, destek/direnç, fiyat, yüzde, tarih gibi görünen bilgileri kısa açıkla.
+- Görseldeki yazı ile Telegram mesaj metnini birbirine karıştırma; ayrı bölümde ver.
 """
 
-    return f"""Sen bir crypto Telegram takip/özet botusun.
-Görev: Aşağıdaki Telegram mesajını Türkçe kanala atılacak şekilde çevir ve özetle.
+    return f"""Sen bir crypto Telegram çeviri botusun.
 
-Kurallar:
-- Korece veya İngilizce ise Türkçeye çevir.
-- Zaten Türkçeyse sadece daha temiz özetle.
-- Crypto jargonunu koru: DeFi, DEX, ETF, staking, airdrop, mainnet, testnet, validator, OTC, liquidity vb.
-- Yatırım tavsiyesi verme. Kesin konuşma. 'Kanal yorumu', 'iddia', 'beklenti' gibi temkinli dil kullan.
-- 5-8 cümleyi geçme.
-- Link içeriği varsa ana mesaja bağlayarak özetle.
+Ana görev:
+Önce Telegram mesaj metnini ve varsa görseldeki yazıları Türkçeye çevir.
+Özetlemeden önce kaynakta yazan her önemli cümleyi koru.
+Son bölümde yalnızca kısa bir yorum/not yazabilirsin.
+
+Çok önemli kurallar:
+- Harici linkleri asla okuma, ziyaret etme veya özetleme.
+- Sadece Telegram mesajının kendi metnini ve varsa gönderilen görseli analiz et.
+- Mesaj metnini mümkün olduğunca cümle cümle çevir.
+- Görseldeki yazıları da mümkün olduğunca cümle cümle çevir.
+- Korece olumsuzluklara çok dikkat et:
+  * 안 나오다 = çıkmamak
+  * 안 나올 가능성 = çıkmama ihtimali
+  * 없어 보인다 = yok gibi görünüyor
+  * 아닐 수 있다 = olmayabilir
+- 'Token çıkar' ile 'token çıkmaz/çıkmayabilir' anlamını asla ters çevirme.
+- Crypto jargonunu koru: DeFi, DEX, ETF, staking, airdrop, mainnet, testnet, validator, OTC, liquidity, Series B, FDV vb.
+- Bilmediğin şeyi uydurma.
+- Kaynak metinde olmayan bilgiyi çeviri bölümüne ekleme.
+- Kısa Not bölümünde resmi açıklama mı, kanal yorumu mu, beklenti mi olduğunu 1-2 cümleyle belirt.
+- Yatırım tavsiyesi verme.
+
 {image_instruction}
-Format:
-📢 Özet: [en kısa ana fikir]
-🌐 Detay: [çeviri + önemli detaylar]
-🏷️ Etiketler: [varsa proje/token/konu]
+
+Çıktı formatı:
+🇹🇷 Mesaj Çevirisi:
+[Telegram mesaj metninin Türkçe çevirisi. Metin yoksa 'Mesaj metni yok.' yaz.]
+
+🖼️ Görsel Çevirisi:
+[Görsel varsa görseldeki yazıların ve görünen önemli bilgilerin Türkçe çevirisi. Görsel yoksa 'Görsel yok.' yaz.]
+
+📌 Kısa Not:
+[1-2 cümle. Sadece bağlam/yorum: resmi açıklama mı, kanal yorumu mu, beklenti mi? Abartma, yatırım tavsiyesi verme.]
+
+🏷️ Etiketler:
+[varsa proje/token/konu isimleri]
 
 Telegram mesaj metni:
 {text.strip() if text.strip() else '[Metin yok / sadece görsel olabilir]'}
 
 Link bağlamı:
-{link_context.strip() if link_context.strip() else '[Link bağlamı yok]'}
+[Link okuma kapalı. Harici linkleri dikkate alma.]
 """
 
 
