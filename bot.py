@@ -339,9 +339,18 @@ async def main() -> None:
 
         try:
             result = await call_claude(prompt, image_block=image_block)
-            prefix = "🔔 Kaynak Kanal"
+
+            chat = await event.get_chat()
+            source_name = getattr(chat, "title", None) or getattr(chat, "username", None) or str(chat_id)
+            source_username = getattr(chat, "username", None)
+
+            prefix = f"🔔 Kaynak Kanal: {source_name}"
+            if source_username:
+                prefix += f"\n🔗 https://t.me/{source_username}"
+
             if image_block:
-                prefix += " + Görsel Analizi"
+                prefix += "\n🖼️ Görsel Analizi: Var"
+
             output = f"{prefix}\n\n{result}"
             await send_long_message(bot_client, TARGET_CHANNEL, output)
             print(f"✅ Gönderildi: {seen_key}")
