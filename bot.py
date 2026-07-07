@@ -34,7 +34,7 @@ CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
 SEEN_IDS_FILE = os.environ.get("SEEN_IDS_FILE", "seen_ids.json")
 
 LINK_READER_ENABLED = os.environ.get("LINK_READER_ENABLED", "false").lower() == "true"
-VISION_ENABLED = os.environ.get("VISION_ENABLED", "true").lower() == "true"
+VISION_ENABLED = os.environ.get("VISION_ENABLED", "false").lower() == "true"
 MAX_LINKS = int(os.environ.get("MAX_LINKS", "2"))
 MAX_OUTPUT_TOKENS = int(os.environ.get("MAX_OUTPUT_TOKENS", "900"))
 VISION_MAX_IMAGE_DIM = int(os.environ.get("VISION_MAX_IMAGE_DIM", "1280"))
@@ -164,7 +164,6 @@ def message_has_image(message) -> bool:
     return False
 
 
-
 def should_use_vision(text: str, has_image: bool) -> bool:
     """Cost saver: only use Claude Vision when the image is likely needed."""
     if not VISION_ENABLED or not has_image:
@@ -249,50 +248,28 @@ async def build_image_block(message) -> Optional[Dict[str, Any]]:
 
 
 def build_prompt(text: str, link_context: str, has_image: bool) -> str:
-    image_instruction = ""
-    if has_image:
-        image_instruction = """
-Görsel varsa:
-- Görseldeki yazıları ayrı bölümde Türkçeye çevir.
-- Tweet, tablo, grafik, dashboard, ranking, fiyat, yüzde, tarih, token/proje isimlerini aktar.
-- Net olmayan yerleri uydurma; 'görselde net değil' de.
-"""
+    return f"""Sen Korece ve İngilizce kripto/finans Telegram mesajlarını Türkçeye çeviren bir çeviri botusun.
 
-    return f"""Sen Korece/İngilizce crypto-finans Telegram mesajlarını Türkçeye çeviren botsun.
-
-Görev:
-- Mesaj metnini doğal Türkçe finans/kripto diliyle çevir.
-- Özetleme yapmadan önemli cümleleri koru; ama robotik kelime kelime çeviri yapma.
-- Görsel gönderildiyse görseldeki yazıları ayrıca çevir.
-- En sona kısa bağlam notu ekle.
+Sadece aşağıdaki Telegram mesaj metnini Türkçeye çevir.
 
 Kurallar:
-- Linkleri okuma, harici siteye gitme.
-- Kaynakta olmayan bilgiyi çeviri bölümüne ekleme.
-- Korece olumsuzlukları ters çevirme: 안 나오다=çıkmamak, 안 나올 가능성=çıkmama ihtimali, 아닐 수 있다=olmayabilir.
-- Jargon/isimleri koru: DeFi, DEX, ETF, OTC, liquidity, Series B, FDV, FOMC, MSCI, Samsung Electronics, SK Hynix vb.
-- Kısa Not bölümünde emin değilsen 'haber aktarımı', 'kanal yorumu' veya 'piyasa beklentisi' de; yatırım tavsiyesi verme.
-
-{image_instruction}
+- Görsel varsa dikkate alma, görsel analizi yapma.
+- Linkleri açma, link içeriği hakkında yorum yapma.
+- Özetleme yapma; kaynak metindeki anlamı koru.
+- Türkçesi doğal, kısa ve Telegram'da okunabilir olsun.
+- Kaynakta olmayan bilgi, yorum veya yatırım tavsiyesi ekleme.
+- Özel isimleri, token/proje adlarını ve kripto-finans jargonunu koru.
+- Korece olumsuzluklara dikkat et:
+  안 나오다 = çıkmamak
+  안 나올 가능성 = çıkmama ihtimali
+  아닐 수 있다 = olmayabilir
 
 Format:
 🇹🇷 Mesaj Çevirisi:
-[Mesaj metninin Türkçe çevirisi. Metin yoksa 'Mesaj metni yok.']
-
-🖼️ Görsel Çevirisi:
-[Görsel varsa görünen yazıların Türkçe çevirisi. Görsel yoksa 'Görsel yok.']
-
-📌 Kısa Not:
-[1-3 cümlelik bağlam notu.]
-
-🏷️ Etiketler:
-[proje/token/konu isimleri]
+[Çeviri]
 
 Telegram mesaj metni:
-{text.strip() if text.strip() else '[Metin yok / sadece görsel olabilir]'}
-
-Link bağlamı:
-[Link okuma kapalı.]
+{text.strip() if text.strip() else '[Metin yok]'}
 """
 
 
