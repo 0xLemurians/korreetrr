@@ -1,6 +1,6 @@
 # Telegram Korece -> Türkçe AI Relay Bot
 
-Bu bot birden fazla Telegram kaynak kanalını dinler, mesaj metnini ve varsa gönderilen görseli Claude Haiku ile Türkçeye çevirip/özetleyip hedef Telegram kanalına gönderir.
+Bu bot birden fazla Telegram kaynak kanalını dinler, mesaj metnini Claude Haiku ile Türkçeye çevirip hedef Telegram kanalına gönderir.
 
 Linkleri okumaz. Harici sayfalara gitmez.
 
@@ -20,7 +20,7 @@ SOURCE_CHANNELS=https://t.me/Honeyofwhitesocks_2,https://t.me/KORypto_Announce
 TARGET_CHANNEL=https://t.me/KnightOnline58
 CLAUDE_MODEL=claude-haiku-4-5-20251001
 
-VISION_ENABLED=true
+VISION_ENABLED=false
 MAX_OUTPUT_TOKENS=900
 VISION_MAX_IMAGE_DIM=1280
 VISION_MAX_IMAGE_BYTES=2500000
